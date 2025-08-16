@@ -1,0 +1,269 @@
+body {
+  background: #f5faff;
+  min-height: 100vh;
+  font-family: 'Segoe UI', 'Arial', sans-serif;
+}
+
+.main-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.paper {
+  padding: 40px 36px 36px 36px;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px #31628c22;
+  background: #fff;
+  min-width: 360px;
+  max-width: 480px;
+}
+
+.header-title {
+  font-size: 2.8rem !important;
+  font-weight: 500 !important;
+  color: #31628c !important;
+  margin-bottom: 4px !important;
+  letter-spacing: 0.02em !important;
+}
+
+.header-subtitle {
+  font-size: 1.15rem !important;
+  color: #4678ab !important;
+  margin-bottom: 22px !important;
+}
+
+.phone-input {
+  font-size: 2rem;
+  font-weight: bold;
+  width: 100%;
+  padding: 30px 24px;
+  border-radius: 48px;
+  border: none;
+  margin-bottom: 20px;
+  background: #f5faff;
+  box-shadow: 0 2px 16px #e0f2ff44;
+  outline: none;
+  transition: box-shadow 0.2s;
+}
+
+.phone-input:focus {
+  box-shadow: 0 4px 22px #b0e2ff66;
+}
+
+.button-main {
+  background: #31628c;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.18rem;
+  border: none;
+  border-radius: 10px;
+  padding: 13px 35px;
+  margin-bottom: 10px;
+  margin-top: 2px;
+  cursor: pointer;
+  box-shadow: 0 2px 12px #31628c33;
+  transition: background 0.18s, box-shadow 0.18s;
+}
+
+.button-main:disabled {
+  background: #e6e6e6 !important;
+  color: #bdbdbd !important;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.button-secondary {
+  background: #fff;
+  color: #31628c;
+  border: 2px solid #31628c;
+  font-size: 1.02rem;
+  border-radius: 7px;
+  padding: 9px 18px;
+  margin-top: 5px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px #e0f2ff33;
+  transition: color 0.18s, border 0.18s;
+}
+
+.button-secondary:hover {
+  background: #f5faff;
+  border: 2px solid #204060;
+  color: #204060;
+}
+
+.slot-button {
+  min-width: 76px !important;
+  min-height: 46px !important;
+  font-size: 1.17rem !important;
+  margin: 5px !important;
+  border-radius: 10px !important;
+  font-weight: 600;
+  box-shadow: 0 2px 8px #e0f2ff33;
+  transition: background 0.18s, color 0.18s, border 0.18s;
+}
+
+.slot-button.selected,
+.slot-button.MuiButton-containedPrimary {
+  background: #31628c !important;
+  color: #fff !important;
+  border: none !important;
+}
+
+.time-slot {
+  min-width: 76px;
+  min-height: 46px;
+  font-size: 1.17rem;
+  margin: 5px;
+  border-radius: 10px;
+  background: #f5faff;
+  color: #bfc8d2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  opacity: 0.5;
+}
+
+.sms-input {
+  font-size: 2.2rem;
+  letter-spacing: 18px;
+  width: 170px;
+  text-align: center;
+  border: none;
+  background: #f5faff;
+  border-radius: 10px;
+  padding: 18px 0;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 10px #e0f2ff44;
+  outline: none;
+}
+
+.numpad-row {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+
+.numpad-button {
+  width: 44px;
+  height: 44px;
+  font-size: 1.5rem;
+  border-radius: 8px;
+  border: 1.5px solid #31628c;
+  background: #fff;
+  color: #31628c;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px #e0f2ff22;
+  transition: background 0.15s, color 0.15s;
+}
+
+.numpad-button:active {
+  background: #e0f2ff;
+}
+
+.check-icon {
+  font-size: 4rem !important;
+  color: #50c878;
+  margin-bottom: 14px;
+}
+
+.booking-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 18px;
+}
+
+.booking-title {
+  color: #31628c !important;
+  font-size: 2rem !important;
+  font-weight: 700 !important;
+  margin-bottom: 0.3em !important;
+}
+
+.booking-details {
+  font-size: 1.1rem !important;
+  color: #31628c !important;
+  margin-bottom: 1em !important;
+  text-align: center;
+}
+
+.sms-alert {
+  margin-bottom: 18px !important;
+  width: 100%;
+}
+
+.new-booking-button {
+  background: #31628c;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.13rem;
+  border: none;
+  border-radius: 9px;
+  padding: 11px 32px;
+  margin-top: 9px;
+  cursor: pointer;
+  box-shadow: 0 2px 12px #31628c33;
+  transition: background 0.18s, box-shadow 0.18s;
+}
+
+.new-booking-button:hover {
+  background: #204060;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-areas:
+    "temp load"
+    "schedule booking";
+  grid-template-columns: 1fr 1.5fr;
+  grid-template-rows: 1fr 2fr;
+  gap: 32px 40px;
+  padding: 50px 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.temp-widget {
+  grid-area: temp;
+}
+.load-widget {
+  grid-area: load;
+}
+.schedule-widget {
+  grid-area: schedule;
+}
+.booking-widget {
+  grid-area: booking;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dashboard-widget {
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 4px 24px #31628c13;
+  padding: 32px 26px;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #204060;
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dashboard-widget.temp-widget {
+  align-items: flex-start;
+  justify-content: flex-start;
+  min-width: 320px;
+  min-height: 200px;
+  background: none; /* чтобы не было двойного фона */
+  box-shadow: none;
+  padding: 0;
+}
