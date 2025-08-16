@@ -71,7 +71,7 @@ export function TemperatureWidget() {
               : "—"}
           </Typography>
           <Typography sx={{ fontSize: 20, color: "#333", fontWeight: 500 }}>
-            Тренировочный
+            Тренировочный_stas
           </Typography>
         </Box>
         {/* Остальные бассейны - только если open */}
