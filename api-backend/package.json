@@ -10,6 +10,7 @@
     "dotenv": "^16.6.1",
     "express": "^4.19.0",
     "node-fetch": "^3.3.2",
+    "papaparse": "^5.5.3",
     "winston": "^3.17.0"
   }
 }

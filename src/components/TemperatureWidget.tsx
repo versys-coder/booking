@@ -9,7 +9,7 @@ export function TemperatureWidget() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    fetch("http://10.18.15.85:4000/api/pools-temps")
+    fetch("/api/pools-temps")
       .then((res) => res.json())
       .then((data) => {
         setTemps(data);

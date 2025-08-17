@@ -19,6 +19,8 @@ app.use('/api/sms', require('./routes/sms'));
 app.use('/api/set_password', require('./routes/set_password'));
 app.use('/api/pools-temps', require('./routes/temps')); // <--- Твой эндпоинт температур
 
+app.use('/api/pool-workload', require('./routes/poolWorkload')); // <--- Новый эндпоинт загруженности
+
 // --- Раздача статики (build) ---
 app.use(express.static(path.join(__dirname, '../build')));
 

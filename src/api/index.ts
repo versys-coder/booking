@@ -1,7 +1,7 @@
 // src/api/index.ts
 // Функции для взаимодействия с backend API
 
-const BASE_API_URL = process.env.REACT_APP_BASE_API_URL || "http://10.18.15.85:4000";
+const BASE_API_URL = process.env.REACT_APP_BASE_API_URL || "";
 
 const SLOTS_PROXY_URL = `${BASE_API_URL}/api/slots`;
 const CONFIRM_PHONE_PROXY_URL = `${BASE_API_URL}/api/confirm_phone`;
