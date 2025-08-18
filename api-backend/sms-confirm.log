@@ -76,3 +76,11 @@
 2025-08-18 00:47:46 [INFO] [OUT] confirm_phone API response {"phone":"79226161698","confirmation_code":"4376","request_id":"b2e09675-5a89-403a-acce-6e3a3e64c7ec","apiStatus":200,"apiResponse":"{\r\n\"result\": true,\r\n\"data\": {\r\n\"pass_token\": \"F71E49CA658ADE1CC85E4D179EE7BB94\"\r\n}\r\n}"}
 2025-08-18 00:52:14 [INFO] [IN] confirm_phone {"phone":"79226161698","request_id":"445bd1b9-50c9-4388-8b6c-603322764be4","method":"sms"}
 2025-08-18 00:52:14 [INFO] [OUT] confirm_phone API response {"phone":"79226161698","request_id":"445bd1b9-50c9-4388-8b6c-603322764be4","apiStatus":200,"apiResponse":"{\r\n\"result\": true,\r\n\"data\": {\r\n\"auth_type\": \"sms\"\r\n}\r\n}"}
+2025-08-18 07:46:29 [INFO] [IN] confirm_phone {"phone":"79226161698","request_id":"223ea548-0cd6-4f35-818b-5c9326ef79c6","method":"sms"}
+2025-08-18 07:46:30 [INFO] [OUT] confirm_phone API response {"phone":"79226161698","request_id":"223ea548-0cd6-4f35-818b-5c9326ef79c6","apiStatus":200,"apiResponse":"{\r\n\"result\": true,\r\n\"data\": {\r\n\"auth_type\": \"sms\"\r\n}\r\n}"}
+2025-08-18 07:46:47 [INFO] [IN] confirm_phone {"phone":"79226161698","confirmation_code":"8655","request_id":"223ea548-0cd6-4f35-818b-5c9326ef79c6","method":"sms"}
+2025-08-18 07:46:47 [INFO] [OUT] confirm_phone API response {"phone":"79226161698","confirmation_code":"8655","request_id":"223ea548-0cd6-4f35-818b-5c9326ef79c6","apiStatus":200,"apiResponse":"{\r\n\"result\": true,\r\n\"data\": {\r\n\"pass_token\": \"F71E49CA658ADE1CC85E4D179EE7BB94\"\r\n}\r\n}"}
+2025-08-18 07:47:11 [INFO] [IN] confirm_phone {"phone":"79226161698","request_id":"c3afe5f5-b476-4f00-8311-ee058b9fe4a1","method":"sms"}
+2025-08-18 07:47:12 [INFO] [OUT] confirm_phone API response {"phone":"79226161698","request_id":"c3afe5f5-b476-4f00-8311-ee058b9fe4a1","apiStatus":200,"apiResponse":"{\r\n\"result\": true,\r\n\"data\": {\r\n\"auth_type\": \"sms\"\r\n}\r\n}"}
+2025-08-18 07:47:20 [INFO] [IN] confirm_phone {"phone":"79226161698","confirmation_code":"8480","request_id":"c3afe5f5-b476-4f00-8311-ee058b9fe4a1","method":"sms"}
+2025-08-18 07:47:20 [INFO] [OUT] confirm_phone API response {"phone":"79226161698","confirmation_code":"8480","request_id":"c3afe5f5-b476-4f00-8311-ee058b9fe4a1","apiStatus":200,"apiResponse":"{\r\n\"result\": true,\r\n\"data\": {\r\n\"pass_token\": \"F71E49CA658ADE1CC85E4D179EE7BB94\"\r\n}\r\n}"}

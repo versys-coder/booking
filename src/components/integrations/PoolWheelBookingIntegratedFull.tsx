@@ -8,6 +8,8 @@ interface Props {
   onReset?: () => void;
 }
 
+const WHEELS_WIDTH = 1100; // подбери под своё количество колес
+
 const PoolWheelBookingIntegratedFull: React.FC<Props> = ({
   onSelectSlot,
   virtualSlot,
@@ -19,7 +21,7 @@ const PoolWheelBookingIntegratedFull: React.FC<Props> = ({
         display: "flex",
         flexDirection: "row",
         gap: 32,
-        alignItems: "flex-start", // ключ!
+        alignItems: "flex-start",
         width: "100%",
         maxWidth: 1600,
         margin: "0 auto",
@@ -27,15 +29,17 @@ const PoolWheelBookingIntegratedFull: React.FC<Props> = ({
       }}
     >
       {/* Левый блок: фиксированная ширина по 4 колеса */}
-      <div style={{ width: 1200, minWidth: 0 }}>
+      <div style={{ width: WHEELS_WIDTH, minWidth: 0 }}>
         <PoolWheelWidget onSelectSlot={onSelectSlot} />
       </div>
-      {/* Правый блок: занимает остаток, no margin-top! */}
-      <div style={{ flex: 1, minWidth: 0 }}>
+
+      {/* Правый блок: занимает остаток, embedded=true */}
+      <div style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "flex-start" }}>
         <QuickBookingFlow
           virtualSlot={virtualSlot ?? null}
           onReset={onReset ?? (() => {})}
           hintWhenNoSlot="Выберите время колесом и нажмите 'Забронировать'"
+          embedded={true}
         />
       </div>
     </div>

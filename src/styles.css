@@ -438,7 +438,7 @@ body {
 .pw-wheels-row {
   display: flex;
   flex-direction: row;
-  gap: 24px;
+  gap: 32px;
   align-items: stretch;
   width: 100%;
   min-width: 0;
@@ -446,10 +446,10 @@ body {
 }
 
 .pw-wheel-card {
-  flex: 0 0 220px; /* фикс ширина */
-  width: 220px;
-  min-width: 180px;
-  max-width: 240px;
+  flex: 0 0 260px;
+  width: 260px;
+  min-width: 220px;
+  max-width: 280px;
   background: var(--color-white, #fff);
   padding: 20px 16px 24px;
   border-radius: 40px;
@@ -812,6 +812,30 @@ body {
   .app-tab-btn { padding: 16px 28px; font-size: 14px; }
 }
 
+/* QuickBookingFlow embedded tweaks */
+.quick-booking-root {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  box-sizing: border-box;
+}
+
+.quick-embedded-paper {
+  padding: 24px 20px;
+  border-radius: var(--radius-m);
+  box-shadow: 0 8px 32px #31628c22;
+  width: 100%;
+  max-width: 520px; /* подбери либо убери */
+  box-sizing: border-box;
+}
+
+/* Убедимся что встраиваемый Paper не тянет на min-height:100vh */
+.quick-booking-root .paper,
+.quick-embedded-paper {
+  min-height: auto;
+}
 /* =========================================================
    End of file
    ========================================================= */

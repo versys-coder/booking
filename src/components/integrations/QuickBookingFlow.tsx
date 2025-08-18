@@ -29,6 +29,7 @@ interface QuickBookingFlowProps {
   virtualSlot: VirtualSlot | null;
   onReset: () => void;
   hintWhenNoSlot?: string;
+  embedded?: boolean;
 }
 
 function normalizePhone(p: string) {
@@ -71,6 +72,7 @@ const QuickBookingFlow: React.FC<QuickBookingFlowProps> = ({
   virtualSlot,
   onReset,
   hintWhenNoSlot,
+  embedded = false,
 }) => {
   const [phone, setPhone] = useState("+7 (");
   const [phoneError, setPhoneError] = useState(false);
@@ -98,8 +100,7 @@ const QuickBookingFlow: React.FC<QuickBookingFlowProps> = ({
   useEffect(() => {}, [requestId]);
   useEffect(() => {}, [phone]);
 
-  // Сброс при смене выбранного слота
-  useEffect(()=>{
+  useEffect(() => {
     if (virtualSlot && bookingResult) {
       resetAll();
     }
@@ -285,234 +286,253 @@ const QuickBookingFlow: React.FC<QuickBookingFlowProps> = ({
     onReset();
   }
 
-  return (
-    <Container className="main-container" maxWidth="sm">
-      <Paper className="paper" elevation={10}>
-        <Typography className="header-title" variant="h5" align="center">
-          Быстрое бронирование
+  // Весь JSX выводим так:
+  const content = (
+    <>
+      <Typography className="header-title" variant="h5" align="center">
+        Быстрое бронирование
+      </Typography>
+      {virtualSlot && !bookingResult && (
+        <Typography
+          align="center"
+          style={{
+            marginTop: 8,
+            fontSize: 18,
+            color: "var(--theme-color)",
+            letterSpacing: ".02em",
+            fontWeight: 700,
+          }}
+        >
+          {(() => {
+            const d = new Date(virtualSlot.start_date.replace(" ", "T"));
+            return (
+              <>
+                Дата:{" "}
+                <b>
+                  {d.toLocaleDateString("ru-RU", {
+                    day: "2-digit",
+                    month: "long",
+                    year: "numeric",
+                  })}{" "}
+                  ({weekdayNames[d.getDay()]})
+                </b>
+                <br />
+                Время:{" "}
+                <b>
+                  {d.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" })}
+                </b>
+              </>
+            );
+          })()}
+          {virtualSlot.appointment_id.startsWith("virtual-") && (
+            <span style={{ display:"block", marginTop:6, fontSize:12, color:"#d22", fontWeight:700 }}>
+              Нет реального appointment_id — бронирование недоступно
+            </span>
+          )}
         </Typography>
-        {virtualSlot && !bookingResult && (
+      )}
+
+      {!virtualSlot && (
+        <Box
+          style={{
+            marginTop: 24,
+            fontSize: 18,
+            textAlign: "center",
+            fontWeight: 600,
+            color: "var(--theme-color)",
+          }}
+        >
+          {hintWhenNoSlot || "Выберите время в виджете слева"}
+        </Box>
+      )}
+
+      {apiError && (
+        <Alert className="alert-error" severity="error" style={{ marginTop: 16 }}>
+          {apiError}
+        </Alert>
+      )}
+
+      {/* Ввод телефона */}
+      {virtualSlot && !smsRequested && !bookingResult && (
+        <Box
+          style={{
+            marginTop: 32,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 16,
+          }}
+        >
+          <input
+            className="phone-input"
+            value={phone}
+            onChange={handlePhoneChange}
+            placeholder="+7 (999) 999-99-99"
+            type="tel"
+            disabled={loading}
+            style={{ fontSize: 20 }}
+          />
+          {phoneError && (
+            <div style={{ color: "#d32f2f", fontWeight: 700, marginBottom: 8 }}>
+              Введите корректный номер
+            </div>
+          )}
+          <button
+            className="button-main"
+            disabled={
+              loading ||
+              !validatePhone(phone) ||
+              !virtualSlot ||
+              virtualSlot.appointment_id.startsWith("virtual-")
+            }
+            onClick={requestSmsCode}
+          >
+            Получить SMS-код
+          </button>
+          <button className="button-secondary" onClick={resetAll} type="button">
+            Сбросить
+          </button>
+        </Box>
+      )}
+
+      {/* Ввод кода из SMS */}
+      {virtualSlot && smsRequested && !bookingResult && (
+        <Box style={{ marginTop: 32 }}>
           <Typography
             align="center"
             style={{
-              marginTop: 8,
-              fontSize: 18,
-              color: "var(--theme-color)",
-              letterSpacing: ".02em",
               fontWeight: 700,
-            }}
-          >
-            {(() => {
-              const d = new Date(virtualSlot.start_date.replace(" ", "T"));
-              return (
-                <>
-                  Дата:{" "}
-                  <b>
-                    {d.toLocaleDateString("ru-RU", {
-                      day: "2-digit",
-                      month: "long",
-                      year: "numeric",
-                    })}{" "}
-                    ({weekdayNames[d.getDay()]})
-                  </b>
-                  <br />
-                  Время:{" "}
-                  <b>
-                    {d.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" })}
-                  </b>
-                </>
-              );
-            })()}
-            {virtualSlot.appointment_id.startsWith("virtual-") && (
-              <span style={{ display:"block", marginTop:6, fontSize:12, color:"#d22", fontWeight:700 }}>
-                Нет реального appointment_id — бронирование недоступно
-              </span>
-            )}
-          </Typography>
-        )}
-
-        {!virtualSlot && (
-          <Box
-            style={{
-              marginTop: 24,
-              fontSize: 18,
-              textAlign: "center",
-              fontWeight: 600,
+              fontSize: 20,
               color: "var(--theme-color)",
+              marginBottom: 8,
             }}
           >
-            {hintWhenNoSlot || "Выберите время в виджете слева"}
-          </Box>
-        )}
-
-        {apiError && (
-          <Alert className="alert-error" severity="error" style={{ marginTop: 16 }}>
-            {apiError}
-          </Alert>
-        )}
-
-        {virtualSlot && !smsRequested && !bookingResult && (
+            Введите код из SMS
+          </Typography>
           <Box
             style={{
-              marginTop: 32,
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
               gap: 16,
             }}
           >
-            <input
-              className="phone-input"
-              value={phone}
-              onChange={handlePhoneChange}
-              placeholder="+7 (999) 999-99-99"
-              type="tel"
-              disabled={loading}
-              style={{ fontSize: 20 }}
+            <SmsCodeInput
+              value={smsCode}
+              onChange={(val) => {
+                setSmsCode(val);
+                if (smsCodeError) {
+                  setSmsCodeError(false);
+                  setSmsCodeHelper("");
+                }
+                setSmsCodeLocked(false);
+              }}
+              length={4}
+              error={smsCodeError}
+              helperText={smsCodeHelper}
+              disabled={smsCodeLoading}
+              onComplete={confirmCodeAndBook}
             />
-            {phoneError && (
-              <div style={{ color: "#d32f2f", fontWeight: 700, marginBottom: 8 }}>
-                Введите корректный номер
-              </div>
+            {smsCodeLoading && (
+              <Box
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  padding: "16px 0",
+                  minHeight: 55,
+                }}
+              >
+                <CircularProgress />
+              </Box>
             )}
+            <button className="button-secondary" onClick={resetAll} type="button">
+              Назад
+            </button>
             <button
               className="button-main"
               disabled={
-                loading ||
-                !validatePhone(phone) ||
-                !virtualSlot ||
-                virtualSlot.appointment_id.startsWith("virtual-")
+                smsCodeLoading ||
+                smsCode.length !== 4 ||
+                smsCodeLocked ||
+                triedCodesRef.current.has(smsCode)
               }
-              onClick={requestSmsCode}
+              onClick={() => confirmCodeAndBook()}
+              type="button"
             >
-              Получить SMS-код
-            </button>
-            <button className="button-secondary" onClick={resetAll} type="button">
-              Сбросить
+              Подтвердить
             </button>
           </Box>
-        )}
+        </Box>
+      )}
 
-        {virtualSlot && smsRequested && !bookingResult && (
-          <Box style={{ marginTop: 32 }}>
-            <Typography
-              align="center"
-              style={{
-                fontWeight: 700,
-                fontSize: 20,
-                color: "var(--theme-color)",
-                marginBottom: 8,
-              }}
-            >
-              Введите код из SMS
-            </Typography>
-            <Box
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: 16,
-              }}
-            >
-              <SmsCodeInput
-                value={smsCode}
-                onChange={(val) => {
-                  setSmsCode(val);
-                  if (smsCodeError) {
-                    setSmsCodeError(false);
-                    setSmsCodeHelper("");
-                  }
-                  setSmsCodeLocked(false);
-                }}
-                length={4}
-                error={smsCodeError}
-                helperText={smsCodeHelper}
-                disabled={smsCodeLoading}
-                onComplete={confirmCodeAndBook}
-              />
-              {smsCodeLoading && (
-                <Box
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    padding: "16px 0",
-                    minHeight: 55,
-                  }}
-                >
-                  <CircularProgress />
-                </Box>
-              )}
-              <button className="button-secondary" onClick={resetAll} type="button">
-                Назад
-              </button>
-              <button
-                className="button-main"
-                disabled={
-                  smsCodeLoading ||
-                  smsCode.length !== 4 ||
-                  smsCodeLocked ||
-                  triedCodesRef.current.has(smsCode)
-                }
-                onClick={() => confirmCodeAndBook()}
-                type="button"
-              >
-                Подтвердить
-              </button>
-            </Box>
-          </Box>
-        )}
-
-        {bookingResult && (
-          <Box className="booking-success">
-            <Typography
-              className="booking-title"
-              variant="h4"
-              gutterBottom
-              style={{ fontSize: 28 }}
-            >
-              Бронирование
-              <br /> выполнено
-            </Typography>
-            {bookingResult?.data?.data?.appointment &&
-              bookingResult?.data?.data?.customer && (
-                <Typography className="booking-details" variant="h6">
-                  {
-                    bookingResult.data.data.customer[
-                      "client_name"
-                    ] as string
-                  }{" "}
-                  записан на занятие{" "}
-                  {bookingResult.data.data.appointment.title}
-                  <br />
-                  {bookingResult.data.data.appointment.date_time
-                    ? `в ${new Date(
-                        bookingResult.data.data.appointment.date_time.replace(" ", "T")
-                      ).toLocaleDateString("ru-RU", {
-                        day: "2-digit",
-                        month: "long",
-                        year: "numeric",
-                      })} в ${new Date(
-                        bookingResult.data.data.appointment.date_time.replace(" ", "T")
-                      ).toLocaleTimeString("ru-RU", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}`
-                    : ""}
-                </Typography>
-              )}
-            {smsSent && (
-              <Alert
-                className="sms-alert"
-                severity={smsSent.startsWith("SMS отправлено") ? "success" : "warning"}
-              >
-                {smsSent}
-              </Alert>
+      {/* Успех */}
+      {bookingResult && (
+        <Box className="booking-success">
+          <Typography
+            className="booking-title"
+            variant="h4"
+            gutterBottom
+            style={{ fontSize: 28 }}
+          >
+            Бронирование
+            <br /> выполнено
+          </Typography>
+          {bookingResult?.data?.data?.appointment &&
+            bookingResult?.data?.data?.customer && (
+              <Typography className="booking-details" variant="h6">
+                {
+                  bookingResult.data.data.customer[
+                    "client_name"
+                  ] as string
+                }{" "}
+                записан на занятие{" "}
+                {bookingResult.data.data.appointment.title}
+                <br />
+                {bookingResult.data.data.appointment.date_time
+                  ? `в ${new Date(
+                      bookingResult.data.data.appointment.date_time.replace(" ", "T")
+                    ).toLocaleDateString("ru-RU", {
+                      day: "2-digit",
+                      month: "long",
+                      year: "numeric",
+                    })} в ${new Date(
+                      bookingResult.data.data.appointment.date_time.replace(" ", "T")
+                    ).toLocaleTimeString("ru-RU", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}`
+                  : ""}
+              </Typography>
             )}
-            <button className="new-booking-button" onClick={resetAll} type="button">
-              Новое бронирование
-            </button>
-          </Box>
-        )}
+          {smsSent && (
+            <Alert
+              className="sms-alert"
+              severity={smsSent.startsWith("SMS отправлено") ? "success" : "warning"}
+            >
+              {smsSent}
+            </Alert>
+          )}
+          <button className="new-booking-button" onClick={resetAll} type="button">
+            Новое бронирование
+          </button>
+        </Box>
+      )}
+    </>
+  );
+
+  if (embedded) {
+    return (
+      <div className="quick-booking-root">
+        <Paper className="paper quick-embedded-paper" elevation={10}>
+          {content}
+        </Paper>
+      </div>
+    );
+  }
+  return (
+    <Container className="main-container" maxWidth="sm">
+      <Paper className="paper" elevation={10}>
+        {content}
       </Paper>
     </Container>
   );
