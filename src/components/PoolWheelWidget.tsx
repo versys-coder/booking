@@ -276,8 +276,7 @@ const PoolWheelWidget: React.FC<PoolWheelWidgetProps> = ({ onSelectSlot }) => {
   const canBook = Boolean(onSelectSlot && activeSlot && !selectedIsBreak);
 
   return (
-    <div className="pw-root">
-      {/* Только 4 больших колеса, никаких popup, никаких плашек! */}
+    <div className="pw-root" style={{ width: "100%", height: "100%", boxSizing: "border-box" }}>
       {loading && (
         <div className="pw-loader">
           <div className="pw-spinner" />

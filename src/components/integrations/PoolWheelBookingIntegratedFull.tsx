@@ -1,28 +1,42 @@
 import React from "react";
 import PoolWheelWidget from "../PoolWheelWidget";
+import QuickBookingFlow, { VirtualSlot } from "./QuickBookingFlow";
 
 interface Props {
   onSelectSlot: (date: string, hour: number) => void;
+  virtualSlot?: VirtualSlot | null;
+  onReset?: () => void;
 }
 
-/**
- * Интеграция для "колеса" — лёгкий обёртчик, адаптированный под глобальную тему.
- * Использует существующие CSS-переменные (шрифт/цвет/радиусы) и класс .pw-root из styles.css.
- */
-const PoolWheelBookingIntegratedFull: React.FC<Props> = ({ onSelectSlot }) => {
+const PoolWheelBookingIntegratedFull: React.FC<Props> = ({
+  onSelectSlot,
+  virtualSlot,
+  onReset,
+}) => {
   return (
     <div
-      className="pw-root"
       style={{
-        // Основные значения мы держим в CSS-переменных, но на всякий случай указываем их через inline,
-        // чтобы компонент корректно реагировал на live-изменения ThemeControls.
-        fontFamily: "var(--theme-font-family)",
-        color: "var(--theme-color)",
-        background: "var(--color-bg-section)",
+        display: "flex",
+        flexDirection: "row",
+        gap: 32,
+        alignItems: "flex-start", // ключ!
+        width: "100%",
+        maxWidth: 1600,
+        margin: "0 auto",
+        boxSizing: "border-box",
       }}
     >
-      <div style={{ width: "100%", maxWidth: 720, margin: "0 auto", boxSizing: "border-box" }}>
+      {/* Левый блок: фиксированная ширина по 4 колеса */}
+      <div style={{ width: 1200, minWidth: 0 }}>
         <PoolWheelWidget onSelectSlot={onSelectSlot} />
+      </div>
+      {/* Правый блок: занимает остаток, no margin-top! */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <QuickBookingFlow
+          virtualSlot={virtualSlot ?? null}
+          onReset={onReset ?? (() => {})}
+          hintWhenNoSlot="Выберите время колесом и нажмите 'Забронировать'"
+        />
       </div>
     </div>
   );

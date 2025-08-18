@@ -228,7 +228,7 @@ const PoolWorkload: React.FC<PoolWorkloadProps> = ({ compact, mode = "full", onH
   }, [slots]);
 
   // === POPUP LOGIC ===
-  function showPopupAtClient(clientX: number, clientY: number, val: number, h: number, isBreak: boolean) {
+  function showPopupAtClient(clientX: number, clientY: number, val: number, h: number, br: boolean) {
     if (!containerRef.current) return;
     if (popupTimeout.current) window.clearTimeout(popupTimeout.current);
     const rect = containerRef.current.getBoundingClientRect();
@@ -247,7 +247,7 @@ const PoolWorkload: React.FC<PoolWorkloadProps> = ({ compact, mode = "full", onH
       top,
       value: val,
       hour: h,
-      isBreak,
+      isBreak: br,
       visible: true,
     });
   }
@@ -324,58 +324,6 @@ const PoolWorkload: React.FC<PoolWorkloadProps> = ({ compact, mode = "full", onH
         boxShadow: "none"
       }}
     >
-      {/* Top cards row */}
-      <div style={{
-        display: "flex",
-        gap: 32,
-        padding: "0 0 18px 0",
-        marginLeft: 54,
-        marginBottom: 10,
-      }}>
-        <div style={{
-          flex: "0 0 208px",
-          background: "#eaf6ff",
-          borderRadius: 32,
-          padding: "18px 20px",
-          boxShadow: "0 2px 18px #185a9020",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start"
-        }}>
-          <div style={{ color: "#185a90", fontWeight: 800, fontSize: 16, letterSpacing: ".04em", marginBottom: 2 }}>В БАССЕЙНЕ</div>
-          <div style={{ fontSize: 38, fontWeight: 900, color: "#123" }}>{current == null ? "—" : current}</div>
-          <div style={{ fontSize: 13, color: "#185a90", opacity: 0.85, fontWeight: 600, marginTop: 3 }}>сейчас человек</div>
-        </div>
-        <div style={{
-          flex: "0 0 208px",
-          background: "#eaf6ff",
-          borderRadius: 32,
-          padding: "18px 20px",
-          boxShadow: "0 2px 18px #185a9020",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start"
-        }}>
-          <div style={{ color: "#185a90", fontWeight: 800, fontSize: 16, letterSpacing: ".04em", marginBottom: 2 }}>СВОБОДНО</div>
-          <div style={{ fontSize: 38, fontWeight: 900, color: "#123" }}>{freePlaces}</div>
-          <div style={{ fontSize: 13, color: "#185a90", opacity: 0.85, fontWeight: 600, marginTop: 3 }}>мест осталось</div>
-        </div>
-        <div style={{
-          flex: "0 0 208px",
-          background: "#fafdff",
-          borderRadius: 32,
-          padding: "18px 20px",
-          boxShadow: "0 2px 18px #185a9020",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: 84,
-        }}>
-          {/* Температурный виджет - единый стиль для мини и фулл */}
-          <TemperatureWidget mode="mini" scale={1.13} />
-        </div>
-      </div>
-
       {/* Chart card */}
       <div style={{
         background: "#fff",
