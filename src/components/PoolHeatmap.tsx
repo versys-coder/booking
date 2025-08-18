@@ -40,7 +40,7 @@ interface PopupState {
   source?: string;
 }
 
-/* Функция цвета: плавный фиолетовый → сине‑голубой по количеству свободных мест */
+/* Цвет по числу свободных мест: плавный фиолетовый → сине‑голубой по количеству свободных мест */
 function colorForFreePlaces(freePlaces: number) {
   const ratio = Math.max(0, Math.min(1, freePlaces / TOTAL_PLACES));
   // Градиент ключевых точек
@@ -51,7 +51,6 @@ function colorForFreePlaces(freePlaces: number) {
     { pos: 0.75,c: [102,123,255] },   // #667bff
     { pos: 1,   c: [60, 174,255] },   // #3caeff (много)
   ];
-  // Найдём два соседних стопа
   let i=0;
   for (; i<stops.length-1; i++) {
     if (ratio <= stops[i+1].pos) break;
@@ -207,8 +206,8 @@ const PoolHeatmap: React.FC = () => {
           popupBase.x,
           popupBase.y,
           panel,
-            popupRef.current.offsetWidth,
-            popupRef.current.offsetHeight
+          popupRef.current.offsetWidth,
+          popupRef.current.offsetHeight
         );
         setPopup({ ...popupBase, x, y });
       }

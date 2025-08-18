@@ -11,7 +11,7 @@ const TARGET_SERVICE_ID = "9672bb23-7060-11f0-a902-00583f11e32d";
 
 interface Slot {
   appointment_id: string;
-  start_date: string;
+  start_date: string; // "YYYY-MM-DD HH:MM:SS" or "YYYY-MM-DDTHH:MM:SS"
   service_id: string;
   [key: string]: any;
 }
@@ -68,6 +68,7 @@ const BookingApp: React.FC = () => {
   const [apiError, setApiError] = useState<string>("");
 
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
+  const [showPhoneStage, setShowPhoneStage] = useState(false);
   const [phone, setPhone] = useState<string>("+7 (");
   const [smsRequested, setSmsRequested] = useState<boolean>(false);
 
@@ -87,7 +88,6 @@ const BookingApp: React.FC = () => {
   const attemptingRef = useRef(false);
   const triedCodesRef = useRef<Set<string>>(new Set());
 
-  // --- SLOTS LOADING ---
   useEffect(() => {
     fetchWeekSlots();
     // eslint-disable-next-line
@@ -102,28 +102,21 @@ const BookingApp: React.FC = () => {
         ? data.slots.filter((slot: Slot) => slot.service_id === TARGET_SERVICE_ID)
         : [];
 
-      // Формируем дни на остаток недели
-      const today = new Date();
-      const todayWeekDay = today.getDay();
-      const weekDates: string[] = [];
-      for (let i = 0; i <= 6 - todayWeekDay; i++) {
-        const d = new Date(today);
-        d.setDate(today.getDate() + i);
-        weekDates.push(d.toISOString().split("T")[0]);
-      }
-
+      // Формируем дни на остаток недели (или даты присутствующие)
       const byDate: Record<string, Slot[]> = {};
       filteredSlots.forEach((slot: Slot) => {
         const date = slot.start_date.replace(" ", "T").split("T")[0];
-        if (weekDates.includes(date)) {
-          (byDate[date] ||= []).push(slot);
-        }
+        (byDate[date] ||= []).push(slot);
       });
+
+      const weekDates = Object.keys(byDate).sort();
 
       setSlotsByDate(byDate);
       setCalendarDates(weekDates);
+      // если дат нет — оставляем индекс 0; SlotPicker корректно обрабатывает пустой список
       setCurrentDateIdx(0);
       setSelectedSlot(null);
+      setShowPhoneStage(false);
       setSmsRequested(false);
       setSmsCode("");
       setBookingResult(null);
@@ -138,7 +131,6 @@ const BookingApp: React.FC = () => {
     }
   }
 
-  // --- PHONE ---
   function handlePhoneChange(e: ChangeEvent<HTMLInputElement>) {
     const raw = e.target.value;
     const formatted = formatPhoneInput(raw);
@@ -174,7 +166,6 @@ const BookingApp: React.FC = () => {
     }
   }
 
-  // --- SMS CODE ---
   async function confirmSmsCodeAndBook(codeArg?: string) {
     const code = codeArg ?? smsCode;
 
@@ -189,15 +180,14 @@ const BookingApp: React.FC = () => {
 
     attemptingRef.current = true;
     setSmsCodeLocked(true);
-    setSmsCodeLoading(true);
     setSmsCodeError(false);
     setSmsCodeHelper("");
     setApiError("");
+    setSmsCodeLoading(true);
 
     const normPhone = normalizePhone(phone);
 
     try {
-      // 1. Подтверждение SMS-кода и получение pass_token
       const passToken = await setPassword(normPhone, code, requestId);
       if (!passToken) {
         triedCodesRef.current.add(code);
@@ -206,16 +196,13 @@ const BookingApp: React.FC = () => {
         setSmsCodeLocked(false);
         return;
       }
-      // 2. Получение профиля клиента
       await getClient(passToken);
 
       if (!selectedSlot) throw new Error("Слот не выбран");
 
-      // 3. Бронирование
       const bookData = await bookSlot(selectedSlot.appointment_id, passToken);
       setBookingResult(bookData);
 
-      // 4. SMS-подтверждение бронирования
       const appointment: BookingApiAppointment =
         bookData?.data?.data?.appointment || {};
       const customer: BookingApiCustomer =
@@ -282,12 +269,12 @@ const BookingApp: React.FC = () => {
     }
   }
 
-  // --- RESET ---
   function resetAll(): void {
     setSlotsByDate({});
     setCalendarDates([]);
     setCurrentDateIdx(0);
     setSelectedSlot(null);
+    setShowPhoneStage(false);
     setPhone("+7 (");
     setSmsRequested(false);
     setSmsCode("");
@@ -305,9 +292,8 @@ const BookingApp: React.FC = () => {
     fetchWeekSlots();
   }
 
-  // --- UI ---
   return (
-    <Container className="main-container" maxWidth="sm">
+    <Container className="main-container" maxWidth="lg">
       <Paper className="paper" elevation={10}>
         <Typography className="header-title" variant="h4" align="center">
           Онлайн-бронирование
@@ -317,12 +303,18 @@ const BookingApp: React.FC = () => {
         </Typography>
 
         {apiError && (
-          <Alert className="alert-error" severity="error">
+          <Alert className="alert-error" severity="error" sx={{ mt: 2 }}>
             {apiError}
           </Alert>
         )}
 
-        {!selectedSlot && (
+        {/* 
+          Показ классического SlotPicker.
+          Важно: передаём обёртку setSelectedSlot, чтобы при выборе слота
+          происходил переход на этап ввода телефона (showPhoneStage=true).
+          Также передаём onBook — на случай, если пользователь внутри SlotPicker нажмёт "Забронировать".
+        */}
+        {!selectedSlot && !showPhoneStage && (
           <SlotPicker
             slotsByDate={slotsByDate}
             calendarDates={calendarDates}
@@ -331,10 +323,15 @@ const BookingApp: React.FC = () => {
             selectedSlot={selectedSlot}
             setSelectedSlot={setSelectedSlot}
             isLoading={loading}
+            onBook={(slot) => {
+              setSelectedSlot(slot);
+              setShowPhoneStage(true);
+            }}
           />
         )}
 
-        {selectedSlot && !smsRequested && (
+        {/* Сцена ввода телефона */}
+        {selectedSlot && showPhoneStage && !smsRequested && (
           <Box
             style={{
               marginTop: 32,
@@ -403,7 +400,8 @@ const BookingApp: React.FC = () => {
           </Box>
         )}
 
-        {selectedSlot && smsRequested && !bookingResult && (
+        {/* ввода СМС */}
+        {selectedSlot && showPhoneStage && smsRequested && !bookingResult && (
           <Box style={{ marginTop: 32 }}>
             <Typography
               align="center"
@@ -458,6 +456,7 @@ const BookingApp: React.FC = () => {
           </Box>
         )}
 
+        {/* успех */}
         {bookingResult && (
           <Box className="booking-success">
             <CheckCircleIcon className="check-icon" />

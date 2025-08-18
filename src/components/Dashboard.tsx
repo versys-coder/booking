@@ -3,13 +3,13 @@ import BookingApp from "./BookingApp";
 import { TemperatureWidget } from "./TemperatureWidget";
 
 const LoadWidget = () => (
-  <div style={{ textAlign: 'center', fontSize: 24, color: '#185a90' }}>
+  <div style={{ textAlign: 'center', fontSize: 24, color: "var(--theme-color)" }}>
     Загруженность: <b>45%</b>
   </div>
 );
 
 const ScheduleWidget = () => (
-  <div style={{ textAlign: 'center', fontSize: 24, color: '#185a90' }}>
+  <div style={{ textAlign: 'center', fontSize: 24, color: "var(--theme-color)" }}>
     Сегодня: 2 события
   </div>
 );
@@ -27,10 +27,10 @@ export default function Dashboard({ onDesigner }: { onDesigner?: () => void }) {
             zIndex: 1000,
             padding: "10px 24px",
             fontSize: 18,
-            background: "#185a90",
-            color: "#fff",
+            background: "var(--theme-bg-active)",
+            color: "var(--theme-color-active)",
             border: "none",
-            borderRadius: 8,
+            borderRadius: "var(--theme-radius)",
             boxShadow: "0 2px 8px #185a9022",
             cursor: "pointer"
           }}

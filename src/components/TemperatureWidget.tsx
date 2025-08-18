@@ -3,104 +3,143 @@ import { Box, Typography, Paper, Collapse } from "@mui/material";
 
 const TEMP_CARD_ORDER = ["Тренировочный", "Детский", "Демонстрационный", "Прыжковый"];
 
-export function TemperatureWidget() {
+export type TemperatureWidgetMode = "full" | "mini";
+type TemperatureWidgetProps = {
+  mode?: TemperatureWidgetMode;
+  scale?: number;
+};
+
+export function TemperatureWidget({ mode = "full", scale = 1 }: TemperatureWidgetProps) {
   const [temps, setTemps] = useState<Record<string, number | null>>({});
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
+    let mounted = true;
     fetch("/api/pools-temps")
       .then((res) => res.json())
       .then((data) => {
-        setTemps(data);
+        if (!mounted) return;
+        setTemps(data || {});
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => {
+        if (!mounted) return;
+        setLoading(false);
+      });
+    return () => { mounted = false; };
   }, []);
 
+  const isMini = mode === "mini";
+
+  const wrapperStyle: React.CSSProperties = {
+    minWidth: isMini ? 160 * scale : 230 * scale,
+    maxWidth: open ? 720 * scale : (isMini ? 260 * scale : 320 * scale),
+    transition: "max-width 260ms cubic-bezier(.2,.9,.2,1)",
+    cursor: "pointer",
+    display: "inline-block",
+    background: "#fff",
+    borderRadius: 32,
+    boxShadow: "0 2px 18px #185a9020",
+    border: "none"
+  };
+
+  const paperStyle: React.CSSProperties = {
+    borderRadius: 32,
+    padding: isMini ? "10px 18px" : "20px 26px",
+    minWidth: isMini ? 160 * scale : 230 * scale,
+    maxWidth: open ? 720 * scale : (isMini ? 260 * scale : 320 * scale),
+    height: isMini ? 96 * scale : 180 * scale,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: open ? "flex-start" : "center",
+    flexDirection: "row",
+    gap: open ? 20 * scale : 0,
+    overflow: "hidden",
+    boxShadow: "none",
+    background: "transparent"
+  };
+
+  const titleFont = isMini ? 16 * scale : 22 * scale;
+  const valueFont = isMini ? 37 * scale : 58 * scale;
+  const subFont = isMini ? 15 * scale : 20 * scale;
+
   return (
-    <Box
-      sx={{
-        minWidth: 230,
-        maxWidth: open ? 750 : 320,
-        transition: "max-width 0.4s cubic-bezier(0.4,0,0.2,1)",
-        cursor: "pointer",
-        position: "relative",
+    <div
+      style={wrapperStyle}
+      onClick={(e) => {
+        e.stopPropagation();
+        setOpen((v) => !v);
       }}
-      onClick={() => setOpen((v) => !v)}
+      role="button"
+      aria-expanded={open}
     >
-      <Paper
-        elevation={4}
-        sx={{
-          borderRadius: 6,
-          px: open ? 4 : 3,
-          py: 2,
-          minWidth: 230,
-          maxWidth: open ? 750 : 320,
-          height: 180,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: open ? "flex-start" : "center",
-          flexDirection: "row",
-          transition: "max-width 0.4s cubic-bezier(0.4,0,0.2,1), box-shadow 0.2s",
-          boxShadow: open ? "0 2px 24px #185a9022" : "0 2px 12px #185a9011",
-          gap: open ? 3 : 0,
-        }}
-      >
-        {/* Тренировочный всегда виден */}
+      <Paper style={paperStyle} elevation={0}>
         <Box
           sx={{
-            minWidth: 160,
             display: "flex",
             flexDirection: "column",
-            alignItems: "center",
+            alignItems: "flex-start",
             justifyContent: "center",
-            pr: open ? 4 : 0,
-            borderRight: open ? "2px solid #eaf1f8" : "none",
-            transition: "border 0.2s",
+            minWidth: isMini ? 90 * scale : 160 * scale,
+            pr: open ? 3 * scale : 0,
+            borderRight: open ? "1.5px solid #eaf1f8" : "none",
+            userSelect: "none",
           }}
         >
-          <Typography sx={{ fontSize: 22, fontWeight: 500, mb: 0.5, color: "#185a90" }}>
+          <Typography
+            sx={{
+              fontSize: titleFont,
+              fontWeight: 800,
+              color: "#185a90",
+              textTransform: "uppercase",
+              letterSpacing: ".04em",
+              marginBottom: 1
+            }}
+          >
             Температура
           </Typography>
-          <Typography sx={{ fontSize: 58, fontWeight: 900, color: "#222" }}>
-            {loading
-              ? "…"
-              : temps["Тренировочный"] != null
-              ? temps["Тренировочный"]!.toFixed(1) + "°C"
-              : "—"}
+
+          <Typography
+            sx={{
+              fontSize: valueFont,
+              fontWeight: 900,
+              color: "#222",
+              lineHeight: 1,
+              marginTop: 2 * scale
+            }}
+          >
+            {loading ? "…" : temps["Тренировочный"] != null ? `${temps["Тренировочный"]!.toFixed(1)}°C` : "—"}
           </Typography>
-          <Typography sx={{ fontSize: 20, color: "#333", fontWeight: 500 }}>
-            Тренировочный_stas
+
+          <Typography
+            sx={{
+              fontSize: subFont,
+              color: "#222",
+              fontWeight: 800,
+              marginTop: 2 * scale,
+              textTransform: "lowercase"
+            }}
+          >
+            тренировочный
           </Typography>
         </Box>
-        {/* Остальные бассейны - только если open */}
-        <Collapse in={open} orientation="horizontal" timeout={400}>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 4, pl: 4 }}>
+
+        <Collapse in={open} orientation="horizontal" timeout={260}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 12 * scale, paddingLeft: 18 * scale }}>
             {TEMP_CARD_ORDER.filter((p) => p !== "Тренировочный").map((pool) => (
-              <Box
-                key={pool}
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                }}
-              >
-                <Typography sx={{ fontSize: 18, color: "#185a90", fontWeight: 600 }}>
-                  {pool}
-                </Typography>
-                <Typography sx={{ fontSize: 40, fontWeight: 900, color: "#222" }}>
-                  {loading
-                    ? "…"
-                    : temps[pool] != null
-                    ? temps[pool]!.toFixed(1) + "°C"
-                    : "—"}
+              <Box key={pool} sx={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+                <Typography sx={{ fontSize: 15 * scale, color: "#185a90", fontWeight: 700 }}>{pool}</Typography>
+                <Typography sx={{ fontSize: 22 * scale, fontWeight: 900, color: "#222" }}>
+                  {loading ? "…" : temps[pool] != null ? `${temps[pool]!.toFixed(1)}°C` : "—"}
                 </Typography>
               </Box>
             ))}
           </Box>
         </Collapse>
       </Paper>
-    </Box>
+    </div>
   );
 }
+
+export default TemperatureWidget;

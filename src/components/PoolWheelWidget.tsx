@@ -1,10 +1,4 @@
-import React, {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  useCallback,
-} from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   fetchPoolWorkload,
   PoolWorkloadSlot,
@@ -112,7 +106,7 @@ const Wheel: React.FC<WheelProps> = ({
       el.removeEventListener("touchmove", onTouchMove);
       el.removeEventListener("touchend", onTouchEnd);
     };
-  }, [activeIndex, items.length, disabledIndices]);
+  }, [activeIndex, items.length, disabledIndices, onChange]);
 
   return (
     <div className={"wheel-wrapper "+className} aria-label={ariaLabel}>
@@ -146,7 +140,11 @@ const Wheel: React.FC<WheelProps> = ({
 };
 
 /* ---------- Виджет ---------- */
-export default function PoolWheelWidget() {
+interface PoolWheelWidgetProps {
+  onSelectSlot?: (dateIso: string, hour: number) => void;
+}
+
+const PoolWheelWidget: React.FC<PoolWheelWidgetProps> = ({ onSelectSlot }) => {
   const [slots, setSlots] = useState<PoolWorkloadSlot[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string|null>(null);
@@ -164,8 +162,7 @@ export default function PoolWheelWidget() {
 
       if (loaded.length) {
         if (selectedHour == null) {
-          // первичная инициализация: берем минимальный общий час
-            const first = loaded.map(s=>s.hour).sort((a,b)=>a-b)[0];
+          const first = loaded.map(s=>s.hour).sort((a,b)=>a-b)[0];
           setSelectedHour(first);
         }
       } else {
@@ -178,13 +175,11 @@ export default function PoolWheelWidget() {
     }
   }, [selectedHour]);
 
-  // Загружаем ОДИН раз при монтировании (не зависим от selectedHour!)
   useEffect(()=> {
     fetchData();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // важно: пустой массив
+  }, []);
 
-  /* Уникальные даты */
   const dates = useMemo(()=>{
     const uniq: string[] = [];
     for (const s of slots) if (!uniq.includes(s.date)) uniq.push(s.date);
@@ -193,14 +188,12 @@ export default function PoolWheelWidget() {
 
   const currentDate = dates[dateIndex];
 
-  /* Часы доступные на выбранной дате */
   const dateHoursSet = useMemo(()=>{
     const set = new Set<number>();
     slots.forEach(s=> { if (s.date === currentDate) set.add(s.hour); });
     return set;
   }, [slots, currentDate]);
 
-  /* Если выбранный час исчез при смене даты — подобрать ближайший */
   useEffect(()=> {
     if (!currentDate || selectedHour == null) return;
     if (dateHoursSet.has(selectedHour)) return;
@@ -215,7 +208,6 @@ export default function PoolWheelWidget() {
     setSelectedHour(nearest);
   }, [currentDate, dateHoursSet, selectedHour]);
 
-  /* Мэпим selectedHour в индекс фиксированного массива allHours */
   const hourIndex = useMemo(()=>{
     if (selectedHour == null) return 0;
     const idx = allHours.indexOf(selectedHour);
@@ -225,7 +217,6 @@ export default function PoolWheelWidget() {
   const disabledIndices = useMemo(()=>{
     const set = new Set<number>();
     if (!currentDate) {
-      // все disabled
       allHours.forEach((_, idx)=> set.add(idx));
       return set;
     }
@@ -253,12 +244,10 @@ export default function PoolWheelWidget() {
   const selectedIsBreak =
     currentDate && selectedHour != null && isBreakHour(currentDate, selectedHour);
 
-  /* Колесо Время */
   const timeItems = useMemo(()=> allHours.map(h =>
     currentDate && isBreakHour(currentDate, h) ? "ПЕРЕРЫВ" : `${pad2(h)}:00`
   ), [currentDate]);
 
-  /* Списки по дорожкам / местам */
   const freeLanesItems = useMemo(()=> allHours.map(h => {
     if (!currentDate || isBreakHour(currentDate, h)) return 0;
     const sl = slots.find(s=> s.date === currentDate && s.hour === h);
@@ -271,31 +260,24 @@ export default function PoolWheelWidget() {
     return sl?.freePlaces ?? 0;
   }), [slots, currentDate]);
 
-  /* Обработчики */
   const handleDateChange = useCallback((idx:number)=>{
     setDateIndex(idx);
-    // selectedHour трогать не нужно — эффект сам проверит наличие
   }, []);
 
   const handleHourChange = useCallback((idx:number)=>{
     setSelectedHour(allHours[idx]);
   }, []);
 
-  const onBook = () => {
-    if (!activeSlot || selectedIsBreak) return;
-    alert(`Бронирование (заглушка)
-Дата: ${formatDateRuLong(activeSlot.date)}
-Время: ${pad2(activeSlot.hour)}:00
-Свободных дорожек: ${activeSlot.freeLanes}
-Свободно мест: ${activeSlot.freePlaces}`);
+  const handleBook = () => {
+    if (!onSelectSlot || !activeSlot || selectedIsBreak) return;
+    onSelectSlot(activeSlot.date, activeSlot.hour);
   };
 
-  const canBook = !!activeSlot && !selectedIsBreak;
+  const canBook = Boolean(onSelectSlot && activeSlot && !selectedIsBreak);
 
   return (
     <div className="pw-root">
-      <div className="pw-title">Виджет выбора времени (4 колеса)</div>
-
+      {/* Только 4 больших колеса, никаких popup, никаких плашек! */}
       {loading && (
         <div className="pw-loader">
           <div className="pw-spinner" />
@@ -306,94 +288,88 @@ export default function PoolWheelWidget() {
       {!loading && !error && !dates.length && (
         <div className="pw-empty">Нет данных</div>
       )}
-
       {!loading && !error && dates.length > 0 && currentDate && (
-        <>
-          <div className="pw-wheels-row">
-            {/* Дата */}
-            <div className="pw-wheel-card">
-              <div className="pw-wheel-label">ДАТА</div>
-              <Wheel
-                items={dates.map(formatDateRuLong)}
-                activeIndex={dateIndex}
-                onChange={handleDateChange}
-                ariaLabel="Дата"
-              />
+        <div className="pw-wheels-row">
+          <div className="pw-wheel-card">
+            <div className="pw-wheel-label">ДАТА</div>
+            <Wheel
+              items={dates.map(formatDateRuLong)}
+              activeIndex={dateIndex}
+              onChange={handleDateChange}
+              ariaLabel="Дата"
+            />
+          </div>
+          <div className="pw-wheel-card">
+            <div className="pw-wheel-label">ВРЕМЯ</div>
+            <Wheel
+              items={timeItems}
+              activeIndex={hourIndex}
+              onChange={handleHourChange}
+              ariaLabel="Время"
+              disabledIndices={disabledIndices}
+              breakIndices={breakIndices}
+            />
+          </div>
+          <div className="pw-wheel-card">
+            <div className="pw-wheel-label">СВОБОДНЫЕ ДОРОЖКИ</div>
+            <Wheel
+              items={freeLanesItems.map(v=>String(v))}
+              activeIndex={hourIndex}
+              onChange={() => {}}
+              ariaLabel="Свободные дорожки"
+              disabledIndices={disabledIndices}
+              breakIndices={breakIndices}
+            />
+          </div>
+          <div className="pw-wheel-card pw-wheel-card--places">
+            <div className="pw-wheel-label">СВОБОДНО МЕСТ</div>
+            <Wheel
+              items={freePlacesItems.map(v=>String(v))}
+              activeIndex={hourIndex}
+              onChange={() => {}}
+              ariaLabel="Свободно мест"
+              disabledIndices={disabledIndices}
+              breakIndices={breakIndices}
+            />
+            <div style={{ marginTop: 20, display: "flex", justifyContent: "center" }}>
+              <button
+                className="pw-book-btn pw-book-btn-inline"
+                disabled={!canBook}
+                onClick={handleBook}
+                title={selectedIsBreak ? "Перерыв" : (!activeSlot ? "Нет данных" : "")}
+                style={{
+                  padding: "12px 32px",
+                  borderRadius: 18,
+                  background: canBook ? "#2c6d9f" : "#aacde2",
+                  color: "#fff",
+                  border: "none",
+                  fontWeight: 800,
+                  fontSize: 22,
+                  cursor: canBook ? "pointer" : "default",
+                  boxShadow: canBook ? "0 6px 18px rgba(44,109,159,0.18)" : "none"
+                }}
+              >
+                Забронировать
+              </button>
             </div>
-
-            {/* Время (фиксировано 07..21) */}
-            <div className="pw-wheel-card">
-              <div className="pw-wheel-label">ВРЕМЯ</div>
-              <Wheel
-                items={timeItems}
-                activeIndex={hourIndex}
-                onChange={handleHourChange}
-                ariaLabel="Время"
-                disabledIndices={disabledIndices}
-                breakIndices={breakIndices}
-              />
-            </div>
-
-            {/* Свободные дорожки */}
-            <div className="pw-wheel-card">
-              <div className="pw-wheel-label">СВОБОДНЫЕ ДОРОЖКИ</div>
-              <Wheel
-                items={freeLanesItems.map(v=>String(v))}
-                activeIndex={hourIndex}
-                onChange={handleHourChange}
-                ariaLabel="Свободные дорожки"
-                disabledIndices={disabledIndices}
-                breakIndices={breakIndices}
-              />
-            </div>
-
-            {/* Свободно мест + кнопка */}
-            <div className="pw-wheel-card pw-wheel-card--places">
-              <div className="pw-wheel-label">СВОБОДНО МЕСТ</div>
-              <Wheel
-                items={freePlacesItems.map(v=>String(v))}
-                activeIndex={hourIndex}
-                onChange={handleHourChange}
-                ariaLabel="Свободно мест"
-                disabledIndices={disabledIndices}
-                breakIndices={breakIndices}
-              />
-              <div className="pw-booking-inline">
-                <button
-                  className="pw-book-btn pw-book-btn-inline"
-                  disabled={!canBook}
-                  onClick={onBook}
-                  title={selectedIsBreak ? "Перерыв" : (!activeSlot ? "Нет данных" : "")}
-                >Забронировать</button>
-              </div>
-              <div style={{ marginTop: 14, textAlign:"center" }}>
-                <button
-                  style={{
-                    fontSize:14,
-                    background:"none",
-                    border:"none",
-                    color:"#2c6d9f",
-                    cursor:"pointer",
-                    fontWeight:600
-                  }}
-                  onClick={fetchData}
-                >Обновить данные</button>
-              </div>
+            <div style={{ marginTop: 12, textAlign:"center" }}>
+              <button
+                style={{
+                  fontSize:14,
+                  background:"none",
+                  border:"none",
+                  color:"#2c6d9f",
+                  cursor:"pointer",
+                  fontWeight:600
+                }}
+                onClick={fetchData}
+              >Обновить данные</button>
             </div>
           </div>
-
-          <div className="pw-summary">
-            {selectedHour != null && (
-              <>
-                <div>Дата: <b>{formatDateRuLong(currentDate)}</b></div>
-                <div>Время: <b>{selectedIsBreak ? "ПЕРЕРЫВ" : `${pad2(selectedHour)}:00`}</b></div>
-                <div>Свободных дорожек: <b>{activeSlot?.freeLanes ?? 0}</b></div>
-                <div>Свободно мест: <b>{activeSlot?.freePlaces ?? 0}</b></div>
-              </>
-            )}
-          </div>
-        </>
+        </div>
       )}
     </div>
   );
-}
+};
+
+export default PoolWheelWidget;
