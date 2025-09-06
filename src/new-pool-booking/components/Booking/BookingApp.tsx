@@ -4,12 +4,19 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { v4 as uuidv4 } from "uuid";
 import SlotPicker from "./SlotPicker";
 import SmsCodeInput from "./SmsCodeInput";
-import { fetchSlots, confirmPhone, setPassword, getClient, bookSlot, sendSmsAramba } from "../api";
-import "../styles.css";
+import {
+  fetchSlots,
+  confirmPhone,
+  setPassword,
+  getClient,
+  bookSlot,
+  sendSmsAramba,
+} from "../../../api"; // adjust path if your api.ts is in another place
+import "./booking.css";
 
 const TARGET_SERVICE_ID = "9672bb23-7060-11f0-a902-00583f11e32d";
 
-interface Slot {
+interface SlotApi {
   appointment_id: string;
   start_date: string; // "YYYY-MM-DD HH:MM:SS" or "YYYY-MM-DDTHH:MM:SS"
   service_id: string;
@@ -61,13 +68,13 @@ function validatePhone(phone: string): boolean {
 
 const BookingApp: React.FC = () => {
   // State
-  const [slotsByDate, setSlotsByDate] = useState<Record<string, Slot[]>>({});
+  const [slotsByDate, setSlotsByDate] = useState<Record<string, SlotApi[]>>({});
   const [calendarDates, setCalendarDates] = useState<string[]>([]);
   const [currentDateIdx, setCurrentDateIdx] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
   const [apiError, setApiError] = useState<string>("");
 
-  const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<SlotApi | null>(null);
   const [showPhoneStage, setShowPhoneStage] = useState(false);
   const [phone, setPhone] = useState<string>("+7 (");
   const [smsRequested, setSmsRequested] = useState<boolean>(false);
@@ -98,22 +105,20 @@ const BookingApp: React.FC = () => {
     setApiError("");
     try {
       const data = await fetchSlots();
-      const filteredSlots: Slot[] = Array.isArray(data.slots)
-        ? data.slots.filter((slot: Slot) => slot.service_id === TARGET_SERVICE_ID)
+      const filteredSlots: SlotApi[] = Array.isArray(data.slots)
+        ? data.slots.filter((slot: SlotApi) => slot.service_id === TARGET_SERVICE_ID)
         : [];
 
-      // Формируем дни на остаток недели (или даты присутствующие)
-      const byDate: Record<string, Slot[]> = {};
-      filteredSlots.forEach((slot: Slot) => {
+      // Формируем дни
+      const byDate: Record<string, SlotApi[]> = {};
+      filteredSlots.forEach((slot: SlotApi) => {
         const date = slot.start_date.replace(" ", "T").split("T")[0];
         (byDate[date] ||= []).push(slot);
       });
 
       const weekDates = Object.keys(byDate).sort();
-
       setSlotsByDate(byDate);
       setCalendarDates(weekDates);
-      // если дат нет — оставляем индекс 0; SlotPicker корректно обрабатывает пустой список
       setCurrentDateIdx(0);
       setSelectedSlot(null);
       setShowPhoneStage(false);
@@ -293,27 +298,18 @@ const BookingApp: React.FC = () => {
   }
 
   return (
-    <Container className="main-container" maxWidth="lg">
-      <Paper className="paper" elevation={10}>
-        <Typography className="header-title" variant="h4" align="center">
-          Онл11айн-бронир11ование
+    <Container className="booking-main-container" maxWidth="lg">
+      <Paper className="booking-paper" elevation={10}>
+        <Typography className="booking-header-title" variant="h4" align="center">
         </Typography>
-        <Typography className="header-subtitle" align="center">
-          Дворец водных видов спорта
+        <Typography className="booking-header-subtitle" align="center">
         </Typography>
-
         {apiError && (
-          <Alert className="alert-error" severity="error" sx={{ mt: 2 }}>
+          <Alert className="booking-alert-error" severity="error" sx={{ mt: 2 }}>
             {apiError}
           </Alert>
         )}
 
-        {/* 
-          Показ классического SlotPicker.
-          Важно: передаём обёртку setSelectedSlot, чтобы при выборе слота
-          происходил переход на этап ввода телефона (showPhoneStage=true).
-          Также передаём onBook — на случай, если пользователь внутри SlotPicker нажмёт "Забронировать".
-        */}
         {!selectedSlot && !showPhoneStage && (
           <SlotPicker
             slotsByDate={slotsByDate}
@@ -330,35 +326,11 @@ const BookingApp: React.FC = () => {
           />
         )}
 
-        {/* Сцена ввода телефона */}
+        {/* Phone stage */}
         {selectedSlot && showPhoneStage && !smsRequested && (
-          <Box
-            style={{
-              marginTop: 32,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: 16,
-            }}
-          >
-            <Box
-              style={{
-                padding: 16,
-                background: "#fafdff",
-                borderRadius: 12,
-                boxShadow: "0 2px 14px #e0f2ff66",
-                marginBottom: 16,
-              }}
-            >
-              <Typography
-                style={{
-                  fontWeight: 700,
-                  fontSize: 20,
-                  color: "#31628c",
-                  marginBottom: 8,
-                  letterSpacing: ".02em",
-                }}
-              >
+          <Box className="phone-stage">
+            <Box className="selected-slot-box">
+              <Typography className="selected-slot-time">
                 Время:{" "}
                 <b>
                   {new Date(
@@ -370,6 +342,7 @@ const BookingApp: React.FC = () => {
                 </b>
               </Typography>
             </Box>
+
             <input
               className="phone-input"
               value={phone}
@@ -379,9 +352,7 @@ const BookingApp: React.FC = () => {
               disabled={loading}
             />
             {phoneError && (
-              <div style={{ color: "#d32f2f", fontWeight: 700, marginBottom: 8 }}>
-                Введите корректный номер
-              </div>
+              <div className="field-error">Введите корректный номер</div>
             )}
             <button
               className="button-main"
@@ -400,23 +371,16 @@ const BookingApp: React.FC = () => {
           </Box>
         )}
 
-        {/* ввода СМС */}
+        {/* SMS input stage */}
         {selectedSlot && showPhoneStage && smsRequested && !bookingResult && (
-          <Box style={{ marginTop: 32 }}>
+          <Box className="sms-stage">
             <Typography
               align="center"
-              style={{ fontWeight: 700, fontSize: 20, color: "#31628c", marginBottom: 8 }}
+              className="sms-enter-title"
             >
               Введите код из SMS
             </Typography>
-            <Box
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: 16,
-              }}
-            >
+            <Box className="sms-stage-inner">
               <SmsCodeInput
                 value={smsCode}
                 onChange={(val) => {
@@ -434,14 +398,7 @@ const BookingApp: React.FC = () => {
                 onComplete={confirmSmsCodeAndBook}
               />
               {smsCodeLoading && (
-                <Box
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    padding: "16px 0",
-                    minHeight: 55,
-                  }}
-                >
+                <Box className="sms-loading">
                   <CircularProgress />
                 </Box>
               )}
@@ -456,30 +413,18 @@ const BookingApp: React.FC = () => {
           </Box>
         )}
 
-        {/* успех */}
+        {/* Success */}
         {bookingResult && (
           <Box className="booking-success">
             <CheckCircleIcon className="check-icon" />
-            <Typography
-              className="booking-title"
-              variant="h4"
-              gutterBottom
-            >
+            <Typography className="booking-title" variant="h4" gutterBottom>
               Бронирование успешно!
             </Typography>
             {bookingResult?.data?.data?.appointment &&
               bookingResult?.data?.data?.customer && (
-                <Typography
-                  className="booking-details"
-                  variant="h6"
-                >
-                  {
-                    bookingResult.data.data.customer[
-                      "client_name"
-                    ] as string
-                  }{" "}
-                  записан на занятие{" "}
-                  {bookingResult.data.data.appointment.title}
+                <Typography className="booking-details" variant="h6">
+                  {bookingResult.data.data.customer["client_name"] as string}{" "}
+                  записан на занятие {bookingResult.data.data.appointment.title}
                   <br />
                   {bookingResult.data.data.appointment.date_time
                     ? `в ${new Date(
@@ -506,11 +451,7 @@ const BookingApp: React.FC = () => {
             {smsSent && (
               <Alert
                 className="sms-alert"
-                severity={
-                  smsSent.startsWith("SMS отправлено")
-                    ? "success"
-                    : "warning"
-                }
+                severity={smsSent.startsWith("SMS отправлено") ? "success" : "warning"}
               >
                 {smsSent}
               </Alert>

@@ -8,20 +8,17 @@ import BookingVariant2 from './components/BookingVariants/BookingVariant2';
 import BookingVariant3 from './components/BookingVariants/BookingVariant3';
 import BookingVariant4 from './components/BookingVariants/BookingVariant4';
 
-// import centralized stylesheet
 import './styles/poolBooking.css';
 
 const PoolBookingPage: React.FC = () => {
-  const [tab, setTab] = useState<number>(4);
+  const [tab, setTab] = useState<number>(1);
 
-  // Пример данных — можно подключить стор/хуки и передавать реальные данные
-  const poolStats = { people: 7, free: 113 };
-  const temperature = 27.3;
+  // poolStats больше не нужен!
 
   return (
     <PoolBookingLayout>
       <TabsBar activeTab={tab} setTab={setTab} />
-      <IndicatorsRow poolStats={poolStats} temperature={temperature} />
+      <IndicatorsRow />
       <BookingArea>
         {tab === 1 && <BookingVariant1 />}
         {tab === 2 && <BookingVariant2 />}

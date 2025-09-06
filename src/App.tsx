@@ -1,11 +1,9 @@
-import React from "react";
-import "./styles.css";
-import PoolBookingTabs from "./components/integrations/PoolBookingTabs";
+import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import PoolBookingPage from './new-pool-booking/PoolBookingPage';
 
-export default function App() {
-  return (
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-      <PoolBookingTabs />
-    </div>
-  );
+function App() {
+  return <PoolBookingPage />;
 }
+
+export default App;

@@ -84,3 +84,27 @@
 2025-08-18 07:47:12 [INFO] [OUT] confirm_phone API response {"phone":"79226161698","request_id":"c3afe5f5-b476-4f00-8311-ee058b9fe4a1","apiStatus":200,"apiResponse":"{\r\n\"result\": true,\r\n\"data\": {\r\n\"auth_type\": \"sms\"\r\n}\r\n}"}
 2025-08-18 07:47:20 [INFO] [IN] confirm_phone {"phone":"79226161698","confirmation_code":"8480","request_id":"c3afe5f5-b476-4f00-8311-ee058b9fe4a1","method":"sms"}
 2025-08-18 07:47:20 [INFO] [OUT] confirm_phone API response {"phone":"79226161698","confirmation_code":"8480","request_id":"c3afe5f5-b476-4f00-8311-ee058b9fe4a1","apiStatus":200,"apiResponse":"{\r\n\"result\": true,\r\n\"data\": {\r\n\"pass_token\": \"F71E49CA658ADE1CC85E4D179EE7BB94\"\r\n}\r\n}"}
+2025-08-18 21:36:33 [INFO] [IN] confirm_phone {"phone":"79226161698","request_id":"3947b98e-1fdd-4b57-b4e2-5c2c77b79c6c","method":"sms"}
+2025-08-18 21:36:34 [INFO] [OUT] confirm_phone API response {"phone":"79226161698","request_id":"3947b98e-1fdd-4b57-b4e2-5c2c77b79c6c","apiStatus":200,"apiResponse":"{\r\n\"result\": true,\r\n\"data\": {\r\n\"auth_type\": \"sms\"\r\n}\r\n}"}
+2025-08-18 21:36:56 [INFO] [IN] confirm_phone {"phone":"79226161698","confirmation_code":"4389","request_id":"3947b98e-1fdd-4b57-b4e2-5c2c77b79c6c","method":"sms"}
+2025-08-18 21:36:56 [INFO] [OUT] confirm_phone API response {"phone":"79226161698","confirmation_code":"4389","request_id":"3947b98e-1fdd-4b57-b4e2-5c2c77b79c6c","apiStatus":200,"apiResponse":"{\r\n\"result\": true,\r\n\"data\": {\r\n\"pass_token\": \"F71E49CA658ADE1CC85E4D179EE7BB94\"\r\n}\r\n}"}
+2025-08-19 07:43:52 [INFO] [IN] confirm_phone {"phone":"79226161698","request_id":"1755589432864","method":"sms"}
+2025-08-19 07:43:53 [INFO] [OUT] confirm_phone API response {"phone":"79226161698","request_id":"1755589432864","apiStatus":200,"apiResponse":"{\r\n\"result\": true,\r\n\"data\": {\r\n\"auth_type\": \"sms\"\r\n}\r\n}"}
+2025-08-19 07:44:33 [INFO] [IN] confirm_phone {"phone":"79222909881","request_id":"1755589474108","method":"sms"}
+2025-08-19 07:44:34 [INFO] [OUT] confirm_phone API response {"phone":"79222909881","request_id":"1755589474108","apiStatus":200,"apiResponse":"{\r\n\"result\": true,\r\n\"data\": {\r\n\"auth_type\": \"sms\"\r\n}\r\n}"}
+2025-08-19 07:44:40 [INFO] [IN] confirm_phone {"phone":"79222909881","confirmation_code":"8849","request_id":"1755589474108","method":"sms"}
+2025-08-19 07:44:40 [INFO] [OUT] confirm_phone API response {"phone":"79222909881","confirmation_code":"8849","request_id":"1755589474108","apiStatus":200,"apiResponse":"{\r\n\"result\": true,\r\n\"data\": {\r\n\"pass_token\": \"032BC3A58D9966259AB4905F8935278A\"\r\n}\r\n}"}
+2025-08-19 07:45:27 [INFO] [IN] confirm_phone {"phone":"79226161698","request_id":"519d8b84-d785-42b6-a346-a2e1f9781ccf","method":"sms"}
+2025-08-19 07:45:27 [INFO] [OUT] confirm_phone API response {"phone":"79226161698","request_id":"519d8b84-d785-42b6-a346-a2e1f9781ccf","apiStatus":200,"apiResponse":"{\r\n\"result\": true,\r\n\"data\": {\r\n\"auth_type\": \"sms\"\r\n}\r\n}"}
+2025-08-19 07:45:40 [INFO] [IN] confirm_phone {"phone":"79226161698","confirmation_code":"5030","request_id":"519d8b84-d785-42b6-a346-a2e1f9781ccf","method":"sms"}
+2025-08-19 07:45:40 [INFO] [OUT] confirm_phone API response {"phone":"79226161698","confirmation_code":"5030","request_id":"519d8b84-d785-42b6-a346-a2e1f9781ccf","apiStatus":200,"apiResponse":"{\r\n\"result\": true,\r\n\"data\": {\r\n\"pass_token\": \"F71E49CA658ADE1CC85E4D179EE7BB94\"\r\n}\r\n}"}
+2025-08-19 08:28:49 [INFO] [IN] confirm_phone {"phone":"79226161698","request_id":"063e99c0-436a-4b8e-beb1-ec6fcf34e9e8","method":"sms"}
+2025-08-19 08:28:50 [INFO] [OUT] confirm_phone API response {"phone":"79226161698","request_id":"063e99c0-436a-4b8e-beb1-ec6fcf34e9e8","apiStatus":200,"apiResponse":"{\r\n\"result\": true,\r\n\"data\": {\r\n\"auth_type\": \"sms\"\r\n}\r\n}"}
+2025-08-19 08:34:28 [INFO] [IN] confirm_phone {"phone":"79221707089","request_id":"d5c19bb8-b9a4-46c0-8b0c-05322652c84f","method":"sms"}
+2025-08-19 08:34:29 [INFO] [OUT] confirm_phone API response {"phone":"79221707089","request_id":"d5c19bb8-b9a4-46c0-8b0c-05322652c84f","apiStatus":200,"apiResponse":"{\r\n\"result\": true,\r\n\"data\": {\r\n\"auth_type\": \"sms\"\r\n}\r\n}"}
+2025-08-19 08:34:45 [INFO] [IN] confirm_phone {"phone":"79221707089","confirmation_code":"2640","request_id":"d5c19bb8-b9a4-46c0-8b0c-05322652c84f","method":"sms"}
+2025-08-19 08:34:45 [INFO] [OUT] confirm_phone API response {"phone":"79221707089","confirmation_code":"2640","request_id":"d5c19bb8-b9a4-46c0-8b0c-05322652c84f","apiStatus":200,"apiResponse":"{\r\n\"result\": true,\r\n\"data\": {\r\n\"pass_token\": \"2121DFC1A521ADA1C879FD59FFCD9236\"\r\n}\r\n}"}
+2025-08-19 08:37:11 [INFO] [IN] confirm_phone {"phone":"79991238308","request_id":"caa8d79b-1a67-4195-b521-453e39243de6","method":"sms"}
+2025-08-19 08:37:12 [INFO] [OUT] confirm_phone API response {"phone":"79991238308","request_id":"caa8d79b-1a67-4195-b521-453e39243de6","apiStatus":200,"apiResponse":"{\r\n\"result\": true,\r\n\"data\": {\r\n\"auth_type\": \"sms\"\r\n}\r\n}"}
+2025-08-19 08:37:22 [INFO] [IN] confirm_phone {"phone":"79991238308","confirmation_code":"6571","request_id":"caa8d79b-1a67-4195-b521-453e39243de6","method":"sms"}
+2025-08-19 08:37:22 [INFO] [OUT] confirm_phone API response {"phone":"79991238308","confirmation_code":"6571","request_id":"caa8d79b-1a67-4195-b521-453e39243de6","apiStatus":200,"apiResponse":"{\r\n\"result\": true,\r\n\"data\": {\r\n\"pass_token\": \"F6FB40757F5144340D74B2B70F4833B5\"\r\n}\r\n}"}
